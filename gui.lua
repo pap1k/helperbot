@@ -14,6 +14,10 @@ local activeTab = 0
 local searchMode = false
 
 local searchInpBuf = imgui.ImBuffer(128)
+local editMenu = {
+    answer = imgui.ImBuffer(1024)
+}
+local todeleteId = 0
 
 local imBoolSettings = {
     ["useAnswId"] = imgui.ImBool(settings.get("useAnswId")),
@@ -121,9 +125,8 @@ function M.MainWindow(boolref)
                     searchMode = false
                 end
             end
-
+            local lbase = base.getBase()
             imgui.BeginChild("##LIST")
-                local lbase = base.getBase()
                 for k,v in ipairs(lbase) do
                     if searchMode then
                         local huy = false
@@ -147,7 +150,8 @@ end
 
 function answerElem(v, id)
     if imgui.Button(fa.ICON_FA_TRASH, imgui.ImVec2(20, 20)) then
-        -- popup delete
+        todeleteId = id
+        imgui.OpenPopup("Удаление ответа##"..id)
     end
     imgui.SameLine()
     if imgui.Button(v.answ) then
@@ -159,6 +163,21 @@ function answerElem(v, id)
         imgui.Button(v.trig[i])
     end
     imgui.Spacing() imgui.Separator()
+    if imgui.BeginPopupModal("Удаление ответа##"..id, nil, imgui.WindowFlags.AlwaysAutoResize) then
+        local txt = base.getBase()[todeleteId].answ
+        if txt:len() > 10 then
+            txt = txt:sub(1, 10)
+        end
+        imgui.CenterTextColoredRGB("Вы действительно хотите удалить этот ответ? ["..txt.."]")
+        if imgui.Button("Да") then
+            base.delete(todeleteId)
+            imgui.CloseCurrentPopup() 
+        end
+        if imgui.Button("Нет") then
+            imgui.CloseCurrentPopup() 
+        end
+        imgui.EndPopup()
+    end
 end
 
 -- // Кастомный переключатель (Author: DonHomka)

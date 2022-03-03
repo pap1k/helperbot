@@ -52,4 +52,8 @@ function M.edit()
 
 end
 
+function M.delete(id)
+    table.remove( base,id)
+end
+
 return M
