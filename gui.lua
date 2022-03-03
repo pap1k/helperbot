@@ -14,10 +14,12 @@ local activeTab = 0
 local searchMode = false
 
 local searchInpBuf = imgui.ImBuffer(128)
-local editMenu = {
-    answer = imgui.ImBuffer(1024)
+local newAnswerBuf = imgui.ImBuffer(128)
+
+local createNew = {
+    answerBuf = imgui.ImBuffer(256),
+    triggersBuf = imgui.ImBuffer(1024)
 }
-local todeleteId = 0
 
 local imBoolSettings = {
     ["useAnswId"] = imgui.ImBool(settings.get("useAnswId")),
@@ -138,43 +140,174 @@ function M.MainWindow(boolref)
                        answerElem(v, k) 
                     end
                 end
+                if imgui.Button("Добавить новый ответ") then
+                    imgui.OpenPopup("Добавление нового ответа")
+                end
+                if imgui.BeginPopupModal("Добавление нового ответа", nil, imgui.WindowFlags.AlwaysAutoResize) then
+                    imgui.Text("Введите триггеры. Каждый на своей строке:")
+                    imgui.InputTextMultiline("##newtriggers", createNew.triggersBuf, 1024, imgui.ImVec2(200, 300))
+                    imgui.Spacing()
+                    imgui.Text("Введите ответ:")
+                    imgui.InputText("##newanswer", createNew.answerBuf)
+
+                    if imgui.Button("Добавить##createnew") then
+                        if createNew.answerBuf.v:len() > 1  and createNew.triggersBuf.v:len() > 1 then
+                            local trigs = utils.split(createNew.triggersBuf.v, '\n')
+
+                            base.add(trigs, createNew.answerBuf.v)
+
+                            createNew.triggersBuf.v = ""
+                            createNew.answerBuf.v = ""
+                            imgui.CloseCurrentPopup()
+                        end
+                    end
+                    imgui.SameLine()
+                    if imgui.Button("Отмена##createnew") then
+                        createNew.triggersBuf.v = ""
+                        createNew.answerBuf.v = ""
+                        imgui.CloseCurrentPopup()
+                    end
+                    imgui.EndPopup()
+                end
             imgui.EndChild()
         end
 
     imgui.End()
 end
 
-function popupEdit()
-    
-end
-
 function answerElem(v, id)
-    if imgui.Button(fa.ICON_FA_TRASH, imgui.ImVec2(20, 20)) then
-        todeleteId = id
+    if imgui.Button(fa.ICON_FA_TRASH.."##"..id, imgui.ImVec2(25, 25)) then
         imgui.OpenPopup("Удаление ответа##"..id)
     end
     imgui.SameLine()
-    if imgui.Button(v.answ) then
-        --popup edit answer
+
+    imgui.PushStyleColor(imgui.Col.Button, imgui.ImVec4(33/255, 184/255, 58/255, 1))
+    imgui.PushStyleColor(imgui.Col.ButtonActive, imgui.ImVec4(28/255, 195/255, 56/255, 1))
+    imgui.PushStyleColor(imgui.Col.ButtonHovered, imgui.ImVec4(34/255, 277/255, 66/255, 1))
+    if imgui.Button(v.answ.."##"..id) then
+        imgui.OpenPopup("Редактирование ответа##"..id)
     end
-    imgui.SetCursorPosX(200)
+    imgui.PopStyleColor(3)
+
+    local max = 70
+    local alllen = 0
+    local dofix = false
+    local countedlen = 0
+    local stopindex = 0
     for i = 1, #v.trig do
+        alllen = alllen + v.trig[i]:len()
+    end
+    if alllen >= max then dofix = true end
+    for i = 1, #v.trig do
+        if dofix then
+            countedlen = countedlen + v.trig[i]:len()
+            if countedlen >= max then
+                stopindex = i
+                break
+            end
+        end
         imgui.SameLine()
-        imgui.Button(v.trig[i])
+        if imgui.Button(v.trig[i]) then
+            local newtrig = v.trig
+            table.remove(newtrig, i)
+            base.edit(id, {answ = v.answ, trig = newtrig})
+            break
+        end
+    end
+    if countedlen >= max then
+        imgui.SameLine()
+        if imgui.BeginMenu(">>##"..id, imgui.ImVec2(30, 30)) then
+            for i = stopindex, #v.trig do
+                if imgui.MenuItem(v.trig[i]) then
+                    local newtrig = v.trig
+                    table.remove(newtrig, i)
+                    base.edit(id, {answ = v.answ, trig = newtrig})
+                    break
+                end
+            end
+            imgui.PushStyleColor(imgui.Col.Button, imgui.ImVec4(54/255, 212/255, 238/255, 1))
+            imgui.PushStyleColor(imgui.Col.ButtonActive, imgui.ImVec4(45/255, 206/255, 232/255, 1))
+            imgui.PushStyleColor(imgui.Col.ButtonHovered, imgui.ImVec4(52/255, 223/255, 251/255, 1))
+            if imgui.Button("+##"..id) then
+                imgui.OpenPopup("Добавление триггера##"..id)
+            end
+            imgui.PopStyleColor(3)
+            if imgui.BeginPopupModal("Добавление триггера##"..id, nil, imgui.WindowFlags.AlwaysAutoResize) then
+                imgui.Text("Введите новый триггер:")
+                imgui.InputText("", newAnswerBuf)
+                if imgui.Button("Сохранить##add"..id) then
+                    table.insert( v.trig,newAnswerBuf.v )
+                    base.edit(id, {answ = v.answ, trig = v.trig})
+                    newAnswerBuf.v = ""
+                    imgui.CloseCurrentPopup()
+                end
+                imgui.SameLine()
+                if imgui.Button("Отмена##add"..id) then
+                    newAnswerBuf.v = ""
+                    imgui.CloseCurrentPopup()
+                end
+                imgui.EndPopup()
+            end
+            imgui.EndMenu()
+        end
+    else
+        imgui.PushStyleColor(imgui.Col.Button, imgui.ImVec4(54/255, 212/255, 238/255, 1))
+        imgui.PushStyleColor(imgui.Col.ButtonActive, imgui.ImVec4(45/255, 206/255, 232/255, 1))
+        imgui.PushStyleColor(imgui.Col.ButtonHovered, imgui.ImVec4(52/255, 223/255, 251/255, 1))
+        imgui.SameLine()
+        if imgui.Button("+##"..id) then
+            imgui.OpenPopup("Добавление триггера##"..id)
+        end
+        imgui.PopStyleColor(3)
     end
     imgui.Spacing() imgui.Separator()
+
     if imgui.BeginPopupModal("Удаление ответа##"..id, nil, imgui.WindowFlags.AlwaysAutoResize) then
-        local txt = base.getBase()[todeleteId].answ
+        local txt = v.answ
         if txt:len() > 10 then
             txt = txt:sub(1, 10)
         end
         imgui.CenterTextColoredRGB("Вы действительно хотите удалить этот ответ? ["..txt.."]")
-        if imgui.Button("Да") then
-            base.delete(todeleteId)
+        if imgui.Button("Да##del"..id) then
+            base.delete(id)
             imgui.CloseCurrentPopup() 
         end
-        if imgui.Button("Нет") then
+        imgui.SameLine()
+        if imgui.Button("Нет##del"..id) then
             imgui.CloseCurrentPopup() 
+        end
+        imgui.EndPopup()
+    end
+
+    if imgui.BeginPopupModal("Редактирование ответа##"..id, nil, imgui.WindowFlags.AlwaysAutoResize) then
+        imgui.Text("Введите новый ответ:")
+        imgui.InputText("", newAnswerBuf)
+        if imgui.Button("Сохранить##edit"..id) then
+            base.edit(id, {answ = newAnswerBuf.v, trig = v.trig})
+            newAnswerBuf.v = ""
+            imgui.CloseCurrentPopup()
+        end
+        imgui.SameLine()
+        if imgui.Button("Отмена##edit"..id) then
+            newAnswerBuf.v = ""
+            imgui.CloseCurrentPopup()
+        end
+        imgui.EndPopup()
+    end
+
+    if imgui.BeginPopupModal("Добавление триггера##"..id, nil, imgui.WindowFlags.AlwaysAutoResize) then
+        imgui.Text("Введите новый триггер:")
+        imgui.InputText("", newAnswerBuf)
+        if imgui.Button("Сохранить##add"..id) then
+            table.insert( v.trig,newAnswerBuf.v )
+            base.edit(id, {answ = v.answ, trig = v.trig})
+            newAnswerBuf.v = ""
+            imgui.CloseCurrentPopup()
+        end
+        imgui.SameLine()
+        if imgui.Button("Отмена##add"..id) then
+            newAnswerBuf.v = ""
+            imgui.CloseCurrentPopup()
         end
         imgui.EndPopup()
     end

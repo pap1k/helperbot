@@ -45,15 +45,15 @@ end
 
 function M.add(triggers, answer)
     table.insert( base,{trig = triggers, answ = answer} )
-    save()
+    --save()
 end
 
-function M.edit()
-
+function M.edit(id, new)
+    base[id] = new
 end
 
 function M.delete(id)
-    table.remove( base,id)
+    table.remove(base,id)
 end
 
 return M
