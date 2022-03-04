@@ -14,7 +14,7 @@ local defaults = {
     }
 }
 
-function getFromFile()
+local function getFromFile()
     local data = utils.readFile(defs.BASE_FILENAME)
     local lbase = decodeJson(data)
     if lbase then
@@ -27,9 +27,10 @@ function getFromFile()
     end
 end
 
-function save()
+local function save()
     busy = true
-    utils.writeFile(encodeJson({b = base}))
+    print(encodeJson({b = base}))
+    utils.writeFile(defs.BASE_FILENAME, encodeJson({b = base}))
     base = getFromFile()
     busy = false
 end
