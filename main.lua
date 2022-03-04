@@ -50,7 +50,7 @@ function main()
         if settings.get("useFastAnsw") then
             if answer.status == true then
                 if wasKeyPressed(settings.get("btnFastAnsw")) then
-                    sampSendChat(" /answ "..answer.id.." "..answer.answ)
+                    sampSendChat("/answ "..answer.id.." "..answer.answ)
                     answer.status = false
                 end
             end
@@ -159,7 +159,7 @@ end
 function findAnswer(inputstr, id)
     local work = true
     while work do
-        local result = search(u8(lower(inputstr)))
+        local result = search(u8(lower(inputstr:gsub("[¸¨]", "e"))))
         if result == "!!" then
             work = false
         elseif result == "!!wait" then
@@ -169,7 +169,7 @@ function findAnswer(inputstr, id)
             if answer.status and answer.ts + 5 >= os.clock() then
                 answer.ts = os.clock()
             end
-            while answer.ts + 0.5 >= os.clock() do
+            while answer.ts + 0.5 >= os.clock() and answer.status == false do
                 wait(100)
             end
             announceAndSave(result, id)
@@ -195,7 +195,7 @@ function search(inputstr)
         for k, variant in ipairs(b) do
             local count = 0
             for i = 1, #variant.trig do
-                local test = lower(variant.trig[i])
+                local test = u8(lower(u8:decode(variant.trig[i])))
                 if  inputstr:match("%s"..test.."%s") or 
                     inputstr:match("%s"..test.."$") or 
                     inputstr:match("^"..test.."%s") or 
