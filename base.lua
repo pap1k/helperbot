@@ -30,6 +30,7 @@ end
 function save()
     busy = true
     utils.writeFile(encodeJson({b = base}))
+    base = getFromFile()
     busy = false
 end
 
