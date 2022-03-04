@@ -1,7 +1,7 @@
 local utils = require("helperbot.utils")
 local defs = require("helperbot.defines")
 local errors = require("helperbot.errors")
-local vkeys = require "vkeys"
+local vkeys = require("vkeys")
 
 M = {}
 
