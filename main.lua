@@ -10,7 +10,6 @@ u8 = require("helperbot.u8")
 
 local winActive = gui.imgui.ImBool(false)
 
-local query = {}
 local fastinfo = false
 
 answer = {
