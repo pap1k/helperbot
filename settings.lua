@@ -3,13 +3,9 @@ local defs = require("helperbot.defines")
 local errors = require("helperbot.errors")
 local vkeys = require "vkeys"
 
-M = {
-    inited = false
-}
+M = {}
 
-settings = {}
-
-
+local settings = {}
 
 local defaults = {
     ["useAnswId"] = false,
@@ -59,7 +55,6 @@ function M.init(first)
         utils.writeFile(defs.SETTINGS_FILENAME, encodeJson(defaults))
     end
     settings = getFromFile()
-    M.inited = true
 end
 
 return M

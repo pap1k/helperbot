@@ -152,7 +152,7 @@ function M.MainWindow(boolref)
 
                     if imgui.Button("Добавить##createnew") then
                         if createNew.answerBuf.v:len() > 1  and createNew.triggersBuf.v:len() > 1 then
-                            local trigs = utils.split(createNew.triggersBuf.v, '\n')
+                            local trigs = utils.split(createNew.triggersBuf.v:lower(), '\n')
 
                             base.add(trigs, createNew.answerBuf.v)
 
@@ -236,7 +236,7 @@ function answerElem(v, id)
                 imgui.Text("Введите новый триггер:")
                 imgui.InputText("", newAnswerBuf)
                 if imgui.Button("Сохранить##add"..id) then
-                    table.insert( v.trig,newAnswerBuf.v )
+                    table.insert( v.trig,newAnswerBuf.v:lower() )
                     base.edit(id, {answ = v.answ, trig = v.trig})
                     newAnswerBuf.v = ""
                     imgui.CloseCurrentPopup()
@@ -299,7 +299,7 @@ function answerElem(v, id)
         imgui.Text("Введите новый триггер:")
         imgui.InputText("", newAnswerBuf)
         if imgui.Button("Сохранить##add"..id) then
-            table.insert( v.trig,newAnswerBuf.v )
+            table.insert( v.trig,newAnswerBuf.v:lower() )
             base.edit(id, {answ = v.answ, trig = v.trig})
             newAnswerBuf.v = ""
             imgui.CloseCurrentPopup()

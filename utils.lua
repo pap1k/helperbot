@@ -85,4 +85,13 @@ function M.split(inputstr, sep)
 	return t
 end
 
+function M.inArray(array, needle)
+    for k,v in ipairs(array) do
+        if v == needle then
+            return true
+        end
+    end
+    return false
+end
+
 return M

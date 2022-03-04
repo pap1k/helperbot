@@ -4,8 +4,8 @@ local errors = require("helperbot.errors")
 
 
 M = {}
-
-base = {}
+local busy = false
+local base = {}
 
 local defaults = {
     b = {
@@ -28,7 +28,9 @@ function getFromFile()
 end
 
 function save()
+    busy = true
     utils.writeFile(encodeJson({b = base}))
+    busy = false
 end
 
 function M.init()
@@ -37,6 +39,10 @@ function M.init()
         utils.writeFile(defs.BASE_FILENAME, encodeJson(defaults))
     end
     base = getFromFile()
+end
+
+function M.isBusy()
+    return busy
 end
 
 function M.getBase()
