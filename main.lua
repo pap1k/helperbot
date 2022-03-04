@@ -195,15 +195,11 @@ function search(inputstr)
         for k, variant in ipairs(b) do
             local count = 0
             for i = 1, #variant.trig do
-                print(variant.trig[i], inputstr)
-                print(inputstr:match("%s"..variant.trig[i].."%s"),
-                inputstr:match("%s"..variant.trig[i].."$"),
-                inputstr:match("^"..variant.trig[i].."%s"),
-                inputstr:match("^"..variant.trig[i].."$"))
-                if  inputstr:match("%s"..variant.trig[i].."%s") or 
-                    inputstr:match("%s"..variant.trig[i].."$") or 
-                    inputstr:match("^"..variant.trig[i].."%s") or 
-                    inputstr:match("^"..variant.trig[i].."$") then
+                local test = lower(variant.trig[i])
+                if  inputstr:match("%s"..test.."%s") or 
+                    inputstr:match("%s"..test.."$") or 
+                    inputstr:match("^"..test.."%s") or 
+                    inputstr:match("^"..test.."$") then
                         count = count +1
                 end
             end
