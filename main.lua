@@ -6,6 +6,7 @@ settings = require("helperbot.settings")
 settings.init(not utils.doesFileExist(defs.SETTINGS_FILENAME))
 gui = require("helperbot.gui")
 se = require("lib.samp.events")
+u8 = require("helperbot.u8")
 
 local winActive = gui.imgui.ImBool(false)
 
@@ -15,7 +16,7 @@ local fastinfo = false
 answer = {
     status = false,
     answ = "",
-    id,
+    id = -1,
     ts = os.clock()
 }
 
@@ -23,7 +24,7 @@ playerid = -1
 
 function main()
     repeat wait(0) until isSampAvailable()
-    -- Ñ‡Ðµ ÑÑ‚Ð¾
+    -- ÷å ýòî
     sampAddChatMessage("HelperBot Loaded", -1)
 
     sampRegisterChatCommand('hh', function()
@@ -54,28 +55,28 @@ function main()
 end
 
 function se.onServerMessage(color, text)
-	if fastinfo and text:find('{F5DEB3}Ð˜Ð¼Ñ: .* Ð¢ÐµÐ»ÐµÑ„Ð¾Ð½: .* ÐŸÑ€Ð¾Ð¶Ð¸Ð²Ð°ÐµÑ‚ Ð²: .*') then
-		local country = string.match(text, '{F5DEB3}Ð˜Ð¼Ñ: {ffffff}.*{F5DEB3} Ð¢ÐµÐ»ÐµÑ„Ð¾Ð½: {ffffff}.*{F5DEB3} ÐŸÑ€Ð¾Ð¶Ð¸Ð²Ð°ÐµÑ‚ Ð²: {ffffff}(%a+){F5DEB3}%.')
+	if fastinfo and text:find('{F5DEB3}Èìÿ: .* Òåëåôîí: .* Ïðîæèâàåò â: .*') then
+		local country = string.match(text, '{F5DEB3}Èìÿ: {ffffff}.*{F5DEB3} Òåëåôîí: {ffffff}.*{F5DEB3} Ïðîæèâàåò â: {ffffff}(%a+){F5DEB3}%.')
 		sampAddChatMessage("[INFO]: {"..dectohex(sampGetPlayerColor(id))..'}'..sampGetPlayerNickname(id)..', {e64c5a}'..sampGetPlayerScore(id)..'{5fdbea} LVL, {e64c5a}'..country, 0x5fdbea)
 		fastinfo = false
 		return false
 	end
-	if fastinfo and text:find('Ð¢ÐµÐ»ÐµÑ„Ð¾Ð½Ð½Ñ‹Ð¹ ÑÐ¿Ñ€Ð°Ð²Ð¾Ñ‡Ð½Ð¸Ðº') then
+	if fastinfo and text:find('Òåëåôîííûé ñïðàâî÷íèê') then
 		return false
 	end
-	if fastinfo and text:find('Ð½Ðµ Ð½Ð°Ð¹Ð´ÐµÐ½ Ð² Ñ‚ÐµÐ»ÐµÑ„Ð¾Ð½Ð½Ð¾Ð¼ ÑÐ¿Ñ€Ð°Ð²Ð¾Ñ‡Ð½Ð¸ÐºÐµ') then
-		sampAddChatMessage("[INFO]: {"..dectohex(sampGetPlayerColor(id))..'}'..sampGetPlayerNickname(id)..', {e64c5a}'..sampGetPlayerScore(id)..'{5fdbea} LVL, {e64c5a}ÐÐµÑ‚ Ð´Ð°Ð½Ð½Ñ‹Ñ… Ð¿Ð¾ ÑÑ‚Ñ€Ð°Ð½Ðµ Ð¿Ñ€Ð¾Ð¶Ð¸Ð²Ð°Ð½Ð¸Ñ', 0x5fdbea)
+	if fastinfo and text:find('íå íàéäåí â òåëåôîííîì ñïðàâî÷íèêå') then
+		sampAddChatMessage("[INFO]: {"..dectohex(sampGetPlayerColor(id))..'}'..sampGetPlayerNickname(id)..', {e64c5a}'..sampGetPlayerScore(id)..'{5fdbea} LVL, {e64c5a}Íåò äàííûõ ïî ñòðàíå ïðîæèâàíèÿ', 0x5fdbea)
 		fastinfo = false
 		return false
 	end
 
 	if color == -5631489 and settings.get("useFastAnsw") then
 		if text:find('%[H%].*: .*') then return end
-		if text:find('Ð’Ð¾Ð¿Ñ€Ð¾Ñ Ð¾Ñ‚ .* ID .*:') then		
+		if text:find('Âîïðîñ îò .* ID %d*:.*') then
 			if settings.get("useColor") then sampAddChatMessage('[Q]{ffff52} '..text, 0xc10013)
 			else sampAddChatMessage(text, 0xffaa11) end
 
-			local id, q = string.match(text, 'Ð’Ð¾Ð¿Ñ€Ð¾Ñ Ð¾Ñ‚ .* ID (%d+): (.*)')
+			local id, q = string.match(text, 'Âîïðîñ îò .* ID (%d+): (.*)')
             playerid = id
 			if settings.get("useFastInfo") then
 				fastinfo = true
@@ -84,7 +85,7 @@ function se.onServerMessage(color, text)
 			lua_thread.create(findAnswer, q, id)
 			return false
 		end
-		if text:find('ÐžÑ‚ .* Ð´Ð»Ñ .*') then
+		if text:find('Îò .* äëÿ .*') then
 			if settings.get("useColor") then sampAddChatMessage('[A]{c78108} '..text, 0xc10013)
 			else sampAddChatMessage(text, 0xffaa11) end
 			return false
@@ -154,16 +155,19 @@ end
 function findAnswer(inputstr, id)
     local work = true
     while work do
-        local result = search(inputstr:lower())
-        if result.sub(1, 2) == "!!" then
-            if result == "!!wait" then
-                wait(100)
-            else
-                work = false
-            end
+        local result = search(u8(inputstr:lower()))
+        print("RESULT", result, "SUB", result.sub(1, 2))
+        if result == "!!" then
+            work = false
+        elseif result == "!!wait" then
+            wait(100)
         else
             work = false
-            while answer.ts + 500 >= os.clock() do
+            if answer.status then
+                answer.ts = os.clock()
+            end
+            while answer.ts + 0.5 >= os.clock() do
+                sampAddChatMessage(tostring(answer.ts + 0.5).." > ="..tostring(os.clock()), -1)
                 wait(100)
             end
             announceAndSave(result, id)
@@ -171,26 +175,30 @@ function findAnswer(inputstr, id)
     end
 end
 
-function announceAndSave(result)
-    sampAddChatMessage('Ð’Ð¾Ð·Ð¼Ð¾Ð¶Ð½Ð¾, Ð¿Ð¾Ð´Ð¾Ð¹Ð´ÐµÑ‚ Ð¾Ñ‚Ð²ÐµÑ‚ {c10013}'..result, 0x35b74a)
+function announceAndSave(result, id)
+    sampAddChatMessage('Âîçìîæíî, ïîäîéäåò îòâåò {c10013}'..result, 0x35b74a)
     answer.status = true
     answer.answ = result
+    answer.id = id
     answer.ts = os.clock()
 end
 
 function search(inputstr)
     if not base.isBusy() then
         local b = base.getBase()
-        local words = utils.split(inputstr)
 
         local maxindex = 0
         local max = 0
 
         for k, variant in ipairs(b) do
             local count = 0
-            for i = 0, #variant.trig do
-                if utils.inArray(words, variant.trig[i]) then
-                    count = count +1
+            for i = 1, #variant.trig do
+                if  inputstr:match("%s"..variant.trig[i].."%s") or 
+                    inputstr:match("%s"..variant.trig[i].."$") or 
+                    inputstr:match("^"..variant.trig[i].."%s") or 
+                    inputstr:match("^"..variant.trig[i].."$") then
+                        print(variant.trig[i])
+                        count = count +1
                 end
             end
             if count > max then
@@ -198,9 +206,9 @@ function search(inputstr)
                 maxindex = k
             end
         end
-        
+        print(maxindex, max)
         if maxindex ~= 0 and max ~= 0 then
-            return b[maxindex].answ
+            return u8:decode(b[maxindex].answ)
         else
             return '!!'
         end
