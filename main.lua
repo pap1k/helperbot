@@ -25,7 +25,7 @@ playerid = -1
 function main()
     repeat wait(0) until isSampAvailable()
     -- че это
-    sampAddChatMessage("HelperBot Loaded", -1)
+    sampAddChatMessage("{e9ab4f}[HH]{5fdbea} HelperBot Loaded. ≈баш.", -1)
 
     sampRegisterChatCommand('hh', function()
 		winActive.v = not winActive.v
@@ -167,7 +167,6 @@ function findAnswer(inputstr, id)
                 answer.ts = os.clock()
             end
             while answer.ts + 0.5 >= os.clock() do
-                sampAddChatMessage(tostring(answer.ts + 0.5).." > ="..tostring(os.clock()), -1)
                 wait(100)
             end
             announceAndSave(result, id)
@@ -197,7 +196,6 @@ function search(inputstr)
                     inputstr:match("%s"..variant.trig[i].."$") or 
                     inputstr:match("^"..variant.trig[i].."%s") or 
                     inputstr:match("^"..variant.trig[i].."$") then
-                        print(variant.trig[i])
                         count = count +1
                 end
             end
