@@ -191,7 +191,7 @@ function search(inputstr)
 
         local maxindex = 0
         local max = 0
-
+        local triggered = {}
         for k, variant in ipairs(b) do
             local count = 0
             local percentage = 0
@@ -202,6 +202,7 @@ function search(inputstr)
                     inputstr:match("^"..test.."%s") or 
                     inputstr:match("^"..test.."$") then
                         count = count +1
+                        table.insert( triggered,u8:decode(test) )
                 end
             end
             if count > 0 then
@@ -213,6 +214,7 @@ function search(inputstr)
             end
         end
         print(maxindex, max)
+        utils.print_r(triggered)
         if maxindex ~= 0 and max ~= 0 then
             return u8:decode(b[maxindex].answ)
         else
