@@ -127,9 +127,8 @@ function M.MainWindow(boolref)
                     searchMode = false
                 end
             end
-            imgui.SameLine()
             local lbase = base.getBase()
-            imgui.BeginChild("##LIST")
+            imgui.BeginChild("##LIST", imgui.ImVec2(0, 340))
                 for k,v in ipairs(lbase) do
                     if searchMode then
                         local huy = false
