@@ -194,6 +194,7 @@ function search(inputstr)
 
         for k, variant in ipairs(b) do
             local count = 0
+            local percentage = 0
             for i = 1, #variant.trig do
                 local test = u8(lower(u8:decode(variant.trig[i])))
                 if  inputstr:match("%s"..test.."%s") or 
@@ -203,8 +204,9 @@ function search(inputstr)
                         count = count +1
                 end
             end
-            if count > max then
-                max = count
+            percentage = #variant.trig / count
+            if percentage > max then
+                max = percentage
                 maxindex = k
             end
         end
