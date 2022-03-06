@@ -128,7 +128,7 @@ function M.MainWindow(boolref)
                 end
             end
             local lbase = base.getBase()
-            imgui.BeginChild("##LIST", imgui.ImVec2(0, 340))
+            imgui.BeginChild("##LIST", imgui.ImVec2(0, 335))
                 for k,v in ipairs(lbase) do
                     if searchMode then
                         local huy = false

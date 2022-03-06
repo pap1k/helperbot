@@ -204,10 +204,12 @@ function search(inputstr)
                         count = count +1
                 end
             end
-            percentage = #variant.trig / count
-            if percentage > max then
-                max = percentage
-                maxindex = k
+            if count > 0 then
+                percentage = #variant.trig / count
+                if percentage > max then
+                    max = percentage
+                    maxindex = k
+                end
             end
         end
         print(maxindex, max)
