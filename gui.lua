@@ -262,7 +262,6 @@ function answerElem(v, id)
         end
         imgui.PopStyleColor(3)
     end
-    imgui.Text("max: "..max..", alllen: "..alllen)
     imgui.Spacing() imgui.Separator()
 
     if imgui.BeginPopupModal("Удаление ответа##"..id, nil, imgui.WindowFlags.AlwaysAutoResize) then
