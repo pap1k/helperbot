@@ -127,6 +127,7 @@ function M.MainWindow(boolref)
                     searchMode = false
                 end
             end
+            imgui.SameLine()
             local lbase = base.getBase()
             imgui.BeginChild("##LIST")
                 for k,v in ipairs(lbase) do
@@ -140,36 +141,36 @@ function M.MainWindow(boolref)
                        answerElem(v, k) 
                     end
                 end
-                if imgui.Button("Добавить новый ответ") then
-                    imgui.OpenPopup("Добавление нового ответа")
-                end
-                if imgui.BeginPopupModal("Добавление нового ответа", nil, imgui.WindowFlags.AlwaysAutoResize) then
-                    imgui.Text("Введите триггеры. Каждый на своей строке:")
-                    imgui.InputTextMultiline("##newtriggers", createNew.triggersBuf, 1024, imgui.ImVec2(200, 300))
-                    imgui.Spacing()
-                    imgui.Text("Введите ответ:")
-                    imgui.InputText("##newanswer", createNew.answerBuf)
+            imgui.EndChild()
+            if imgui.Button("Добавить новый ответ") then
+                imgui.OpenPopup("Добавление нового ответа")
+            end
+            if imgui.BeginPopupModal("Добавление нового ответа", nil, imgui.WindowFlags.AlwaysAutoResize) then
+                imgui.Text("Введите триггеры. Каждый на своей строке:")
+                imgui.InputTextMultiline("##newtriggers", createNew.triggersBuf, 1024, imgui.ImVec2(200, 300))
+                imgui.Spacing()
+                imgui.Text("Введите ответ:")
+                imgui.InputText("##newanswer", createNew.answerBuf)
 
-                    if imgui.Button("Добавить##createnew") then
-                        if createNew.answerBuf.v:len() > 1  and createNew.triggersBuf.v:len() > 1 then
-                            local trigs = utils.split(createNew.triggersBuf.v:lower(), '\n')
+                if imgui.Button("Добавить##createnew") then
+                    if createNew.answerBuf.v:len() > 1  and createNew.triggersBuf.v:len() > 1 then
+                        local trigs = utils.split(createNew.triggersBuf.v:lower(), '\n')
 
-                            base.add(trigs, createNew.answerBuf.v)
+                        base.add(trigs, createNew.answerBuf.v)
 
-                            createNew.triggersBuf.v = ""
-                            createNew.answerBuf.v = ""
-                            imgui.CloseCurrentPopup()
-                        end
-                    end
-                    imgui.SameLine()
-                    if imgui.Button("Отмена##createnew") then
                         createNew.triggersBuf.v = ""
                         createNew.answerBuf.v = ""
                         imgui.CloseCurrentPopup()
                     end
-                    imgui.EndPopup()
                 end
-            imgui.EndChild()
+                imgui.SameLine()
+                if imgui.Button("Отмена##createnew") then
+                    createNew.triggersBuf.v = ""
+                    createNew.answerBuf.v = ""
+                    imgui.CloseCurrentPopup()
+                end
+                imgui.EndPopup()
+            end
         end
 
     imgui.End()
@@ -184,23 +185,25 @@ function answerElem(v, id)
     imgui.PushStyleColor(imgui.Col.Button, imgui.ImVec4(33/255, 184/255, 58/255, 1))
     imgui.PushStyleColor(imgui.Col.ButtonActive, imgui.ImVec4(28/255, 195/255, 56/255, 1))
     imgui.PushStyleColor(imgui.Col.ButtonHovered, imgui.ImVec4(34/255, 277/255, 66/255, 1))
-    if imgui.Button(v.answ.."##"..id) then
+    local answtxt = v.answ
+    if answtxt:len() > 15 then answtxt = answtxt:sub(1, 15)..'...' end
+    if imgui.Button(answtxt.."##"..id) then
         imgui.OpenPopup("Редактирование ответа##"..id)
     end
     imgui.PopStyleColor(3)
 
-    local max = 70
+    local max = 450
     local alllen = 0
     local dofix = false
     local countedlen = 0
     local stopindex = 0
     for i = 1, #v.trig do
-        alllen = alllen + v.trig[i]:len()
+        alllen = alllen + v.trig[i]:len()*5.5+10
     end
     if alllen >= max then dofix = true end
     for i = 1, #v.trig do
         if dofix then
-            countedlen = countedlen + v.trig[i]:len()
+            countedlen = countedlen + v.trig[i]:len()*5.5+10
             if countedlen >= max then
                 stopindex = i
                 break
@@ -260,6 +263,7 @@ function answerElem(v, id)
         end
         imgui.PopStyleColor(3)
     end
+    imgui.Text("max: "..max..", alllen: "..alllen)
     imgui.Spacing() imgui.Separator()
 
     if imgui.BeginPopupModal("Удаление ответа##"..id, nil, imgui.WindowFlags.AlwaysAutoResize) then
@@ -280,6 +284,7 @@ function answerElem(v, id)
     end
 
     if imgui.BeginPopupModal("Редактирование ответа##"..id, nil, imgui.WindowFlags.AlwaysAutoResize) then
+        imgui.Text("Старый ответ: "..v.answ)
         imgui.Text("Введите новый ответ:")
         imgui.InputText("", newAnswerBuf)
         if imgui.Button("Сохранить##edit"..id) then
