@@ -194,7 +194,7 @@ function search(inputstr)
         local triggered = {}
         for k, variant in ipairs(b) do
             local count = 0
-            local percentage = 0
+            local percentage = 0.0
             for i = 1, #variant.trig do
                 local test = u8(lower(u8:decode(variant.trig[i])))
                 if  inputstr:match("%s"..test.."%s") or 
@@ -206,7 +206,7 @@ function search(inputstr)
                 end
             end
             if count > 0 then
-                percentage = #variant.trig / count
+                percentage = count / #variant.trig
                 if percentage > max then
                     max = percentage
                     maxindex = k
