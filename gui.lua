@@ -209,7 +209,7 @@ function answerElem(v, id)
             end
         end
         imgui.SameLine()
-        if imgui.Button(v.trig[i]) then
+        if imgui.Button(v.trig[i].."##"..i) then
             local newtrig = v.trig
             table.remove(newtrig, i)
             base.edit(id, {answ = v.answ, trig = newtrig})
