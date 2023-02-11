@@ -24,11 +24,7 @@ playerid = -1
 function main()
     repeat wait(0) until isSampAvailable()
 
-    sampAddChatMessage("{e9ab4f}[HH]{5fdbea} HelperBot Loaded. Åáàø.", -1)
-
-    sampRegisterChatCommand("test", function(txt)
-        sampAddChatMessage(lower(txt), -1)
-    end)
+    sampAddChatMessage(u8:decode("{e9ab4f}[HH]{5fdbea} HelperBot Loaded. Ğ•Ğ±Ğ°Ñˆ."), -1)
 
     sampRegisterChatCommand('hh', function()
 		winActive.v = not winActive.v
@@ -50,7 +46,7 @@ function main()
         if settings.get("useFastAnsw") then
             if answer.status == true then
                 if wasKeyPressed(settings.get("btnFastAnsw")) then
-                    sampSendChat("/answ "..answer.id.." "..answer.answ)
+                    sampSendChat("-/answ "..answer.id.." "..answer.answ)
                     answer.status = false
                 end
             end
@@ -59,28 +55,28 @@ function main()
 end
 
 function se.onServerMessage(color, text)
-	if fastinfo and text:find('{F5DEB3}Èìÿ: .* Òåëåôîí: .* Ïğîæèâàåò â: .*') then
-		local country = string.match(text, '{F5DEB3}Èìÿ: {ffffff}.*{F5DEB3} Òåëåôîí: {ffffff}.*{F5DEB3} Ïğîæèâàåò â: {ffffff}(%a+){F5DEB3}%.')
+	if fastinfo and text:find(u8:decode('{F5DEB3}Ğ˜Ğ¼Ñ: .* Ğ¢ĞµĞ»ĞµÑ„Ğ¾Ğ½: .* ĞŸÑ€Ğ¾Ğ¶Ğ¸Ğ²Ğ°ĞµÑ‚ Ğ²: .*')) then
+		local country = string.match(text, u8:decode('{F5DEB3}Ğ˜Ğ¼Ñ: {ffffff}.*{F5DEB3} Ğ¢ĞµĞ»ĞµÑ„Ğ¾Ğ½: {ffffff}.*{F5DEB3} ĞŸÑ€Ğ¾Ğ¶Ğ¸Ğ²Ğ°ĞµÑ‚ Ğ²: {ffffff}(%a+){F5DEB3}%.'))
 		sampAddChatMessage("[INFO]: {"..dectohex(sampGetPlayerColor(id))..'}'..sampGetPlayerNickname(id)..', {e64c5a}'..sampGetPlayerScore(id)..'{5fdbea} LVL, {e64c5a}'..country, 0x5fdbea)
 		fastinfo = false
 		return false
 	end
-	if fastinfo and text:find('Òåëåôîííûé ñïğàâî÷íèê') then
+	if fastinfo and text:find(u8:decode('Ğ¢ĞµĞ»ĞµÑ„Ğ¾Ğ½Ğ½Ñ‹Ğ¹ ÑĞ¿Ñ€Ğ°Ğ²Ğ¾Ñ‡Ğ½Ğ¸Ğº')) then
 		return false
 	end
-	if fastinfo and text:find('íå íàéäåí â òåëåôîííîì ñïğàâî÷íèêå') then
-		sampAddChatMessage("[INFO]: {"..dectohex(sampGetPlayerColor(id))..'}'..sampGetPlayerNickname(id)..', {e64c5a}'..sampGetPlayerScore(id)..'{5fdbea} LVL, {e64c5a}Íåò äàííûõ ïî ñòğàíå ïğîæèâàíèÿ', 0x5fdbea)
+	if fastinfo and text:find(u8:decode('Ğ½Ğµ Ğ½Ğ°Ğ¹Ğ´ĞµĞ½ Ğ² Ñ‚ĞµĞ»ĞµÑ„Ğ¾Ğ½Ğ½Ğ¾Ğ¼ ÑĞ¿Ñ€Ğ°Ğ²Ğ¾Ñ‡Ğ½Ğ¸ĞºĞµ')) then
+		sampAddChatMessage("[INFO]: {"..dectohex(sampGetPlayerColor(id))..'}'..sampGetPlayerNickname(id)..', {e64c5a}'..sampGetPlayerScore(id)..u8:decode('{5fdbea} LVL, {e64c5a}ĞĞµÑ‚ Ğ´Ğ°Ğ½Ğ½Ñ‹Ñ… Ğ¿Ğ¾ ÑÑ‚Ñ€Ğ°Ğ½Ğµ Ğ¿Ñ€Ğ¾Ğ¶Ğ¸Ğ²Ğ°Ğ½Ğ¸Ñ'), 0x5fdbea)
 		fastinfo = false
 		return false
 	end
 
-	if color == -5631489 and settings.get("useFastAnsw") then
+	if color == -5631489 and (settings.get("useFastAnsw") or settings.get("useAnswId") or settings.get("useColor")) then
 		if text:find('%[H%].*: .*') then return end
-		if text:find('Âîïğîñ îò .* ID %d*:.*') then
+		if text:find(u8:decode('Ğ’Ğ¾Ğ¿Ñ€Ğ¾Ñ Ğ¾Ñ‚ .* ID %d*:.*')) then
 			if settings.get("useColor") then sampAddChatMessage('[Q]{ffff52} '..text, 0xc10013)
 			else sampAddChatMessage(text, 0xffaa11) end
 
-			local id, q = string.match(text, 'Âîïğîñ îò .* ID (%d+): (.*)')
+			local id, q = string.match(text, u8:decode('Ğ’Ğ¾Ğ¿Ñ€Ğ¾Ñ Ğ¾Ñ‚ .* ID (%d+): (.*)'))
             playerid = id
 			if settings.get("useFastInfo") then
 				fastinfo = true
@@ -89,7 +85,7 @@ function se.onServerMessage(color, text)
 			lua_thread.create(findAnswer, q, id)
 			return false
 		end
-		if text:find('Îò .* äëÿ .*') then
+		if text:find(u8:decode('ĞÑ‚ .* Ğ´Ğ»Ñ .*')) then
 			if settings.get("useColor") then sampAddChatMessage('[A]{c78108} '..text, 0xc10013)
 			else sampAddChatMessage(text, 0xffaa11) end
 			return false
@@ -159,7 +155,7 @@ end
 function findAnswer(inputstr, id)
     local work = true
     while work do
-        local result = search(u8(lower(inputstr:gsub("[¸¨]", "e"))))
+        local result = search(u8(lower(inputstr:gsub(u8:decode("[Ñ‘Ğ]"), u8:decode("e")))))
         if result == "!!" then
             work = false
         elseif result == "!!wait" then
@@ -178,7 +174,7 @@ function findAnswer(inputstr, id)
 end
 
 function announceAndSave(result, id)
-    sampAddChatMessage('Âîçìîæíî, ïîäîéäåò îòâåò {c10013}'..result, 0x35b74a)
+    sampAddChatMessage(u8:decode('Ğ’Ğ¾Ğ·Ğ¼Ğ¾Ğ¶Ğ½Ğ¾, Ğ¿Ğ¾Ğ´Ğ¾Ğ¹Ğ´ĞµÑ‚ Ğ¾Ñ‚Ğ²ĞµÑ‚ {c10013}')..result, 0x35b74a)
     answer.status = true
     answer.answ = result
     answer.id = id
@@ -196,13 +192,14 @@ function search(inputstr)
             local count = 0
             local percentage = 0.0
             for i = 1, #variant.trig do
-                local test = u8(lower(u8:decode(variant.trig[i])))
-                if  inputstr:match("%s"..test.."%s") or 
-                    inputstr:match("%s"..test.."$") or 
-                    inputstr:match("^"..test.."%s") or 
-                    inputstr:match("^"..test.."$") then
+                local test = lower(variant.trig[i])
+                if  inputstr:find("%s"..test.."%s") or 
+                    inputstr:find("%s"..test.."$") or 
+                    inputstr:find("^"..test.."%s") or 
+                    inputstr:find("^"..test.."$") then
+                        print("trigger:", test)
                         count = count +1
-                        table.insert( triggered,u8:decode(test) )
+                        table.insert( triggered,test )
                 end
             end
             if count > 0 then
@@ -213,7 +210,6 @@ function search(inputstr)
                 end
             end
         end
-        print(maxindex, max)
         utils.print_r(triggered)
         if maxindex ~= 0 and max ~= 0 then
             return u8:decode(b[maxindex].answ)
@@ -226,8 +222,9 @@ function search(inputstr)
 end
 
 function lower(s)
+    s=u8:decode(s)
     local russian_characters = {
-        [168] = '¨', [184] = '¸', [192] = 'À', [193] = 'Á', [194] = 'Â', [195] = 'Ã', [196] = 'Ä', [197] = 'Å', [198] = 'Æ', [199] = 'Ç', [200] = 'È', [201] = 'É', [202] = 'Ê', [203] = 'Ë', [204] = 'Ì', [205] = 'Í', [206] = 'Î', [207] = 'Ï', [208] = 'Ğ', [209] = 'Ñ', [210] = 'Ò', [211] = 'Ó', [212] = 'Ô', [213] = 'Õ', [214] = 'Ö', [215] = '×', [216] = 'Ø', [217] = 'Ù', [218] = 'Ú', [219] = 'Û', [220] = 'Ü', [221] = 'İ', [222] = 'Ş', [223] = 'ß', [224] = 'à', [225] = 'á', [226] = 'â', [227] = 'ã', [228] = 'ä', [229] = 'å', [230] = 'æ', [231] = 'ç', [232] = 'è', [233] = 'é', [234] = 'ê', [235] = 'ë', [236] = 'ì', [237] = 'í', [238] = 'î', [239] = 'ï', [240] = 'ğ', [241] = 'ñ', [242] = 'ò', [243] = 'ó', [244] = 'ô', [245] = 'õ', [246] = 'ö', [247] = '÷', [248] = 'ø', [249] = 'ù', [250] = 'ú', [251] = 'û', [252] = 'ü', [253] = 'ı', [254] = 'ş', [255] = 'ÿ',
+        [168] = 'Ğ', [184] = 'Ñ‘', [192] = 'Ğ', [193] = 'Ğ‘', [194] = 'Ğ’', [195] = 'Ğ“', [196] = 'Ğ”', [197] = 'Ğ•', [198] = 'Ğ–', [199] = 'Ğ—', [200] = 'Ğ˜', [201] = 'Ğ™', [202] = 'Ğš', [203] = 'Ğ›', [204] = 'Ğœ', [205] = 'Ğ', [206] = 'Ğ', [207] = 'ĞŸ', [208] = 'Ğ ', [209] = 'Ğ¡', [210] = 'Ğ¢', [211] = 'Ğ£', [212] = 'Ğ¤', [213] = 'Ğ¥', [214] = 'Ğ¦', [215] = 'Ğ§', [216] = 'Ğ¨', [217] = 'Ğ©', [218] = 'Ğª', [219] = 'Ğ«', [220] = 'Ğ¬', [221] = 'Ğ­', [222] = 'Ğ®', [223] = 'Ğ¯', [224] = 'Ğ°', [225] = 'Ğ±', [226] = 'Ğ²', [227] = 'Ğ³', [228] = 'Ğ´', [229] = 'Ğµ', [230] = 'Ğ¶', [231] = 'Ğ·', [232] = 'Ğ¸', [233] = 'Ğ¹', [234] = 'Ğº', [235] = 'Ğ»', [236] = 'Ğ¼', [237] = 'Ğ½', [238] = 'Ğ¾', [239] = 'Ğ¿', [240] = 'Ñ€', [241] = 'Ñ', [242] = 'Ñ‚', [243] = 'Ñƒ', [244] = 'Ñ„', [245] = 'Ñ…', [246] = 'Ñ†', [247] = 'Ñ‡', [248] = 'Ñˆ', [249] = 'Ñ‰', [250] = 'ÑŠ', [251] = 'Ñ‹', [252] = 'ÑŒ', [253] = 'Ñ', [254] = 'Ñ', [255] = 'Ñ',
       }
     local strlen = s:len()
     if strlen == 0 then return s end
@@ -237,7 +234,7 @@ function lower(s)
         local ch = s:byte(i)
         if ch >= 192 and ch <= 223 then -- upper russian characters
             output = output .. russian_characters[ch+32]
-        elseif ch == 168 then -- ¨
+        elseif ch == 168 then -- Ğ
             output = output .. russian_characters[184]
         else
             output = output .. string.char(ch)
